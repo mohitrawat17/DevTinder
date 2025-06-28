@@ -9,11 +9,22 @@ app.get('/test',(req,res)=>{
     res.send('test get request')
 })
 
-
+// POST REQUEST WITH QUERY PARAMETERS
 app.post('/test',(req,res)=>{
-    console.log('post request')
+    const userId=req.query.userId
+    const page=req.query.page
+    const pageSize=req.query.pageSize
+    console.log('post request',userId,page,pageSize)
     res.send('test post request')
 })
+
+// POST REQUEST WITH DYNAMIC PARAMETERS
+app.post('/test/:id',(req,res)=>{
+    const id = req.params.id
+    console.log('post request : ',id)
+    res.send('test post request for id : '+id)
+})
+
 
 app.delete('/test',(req,res)=>{
     console.log('delete request')
