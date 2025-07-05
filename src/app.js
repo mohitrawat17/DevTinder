@@ -1,41 +1,46 @@
-const express= require('express')
+const express = require('express')
 
-const app=express()
-const PORT=5000
+const app = express()
+const PORT = 5000
 
-const token='abc'
+const token = 'abc'
 
 
-app.use((req,res,next)=>{
- const isAuthorized=token==='abc'
- if(!isAuthorized){
-    res.status(401).send({'message':'User not authorized'})
- }
- else{
-    next()
- }
+app.use((req, res, next) => {
+    const isAuthorized = token === 'abc'
+    if (!isAuthorized) {
+        res.status(401).send({ 'message': 'User not authorized' })
+    }
+    else {
+        next()
+    }
 })
 
 
-app.get('/user',(req,res)=>{
+app.get('/user', (req, res) => {
     console.log('get request')
     res.send('user get request')
 })
 
 
 // POST REQUEST WITH DYNAMIC PARAMETERS
-app.post('/user/:id',(req,res)=>{
+app.post('/user/:id', (req, res) => {
     const id = req.params.id
-    console.log('post request : ',id)
-    res.send('user post request for id : '+id)
+    console.log('post request : ', id)
+    res.send('user post request for id : ' + id)
 })
 
 
-app.delete('/user',(req,res)=>{
+app.delete('/user', (req, res) => {
     console.log('delete request')
     res.send('user delete request')
 })
 
-app.listen(PORT,()=>{
-    console.log('listening to PORT : ',PORT)
+app.use('/', (err, req, res, next) => {
+    console.log('error : ', err.message)
+    res.status(500).send('something went wrong')
+})
+
+app.listen(PORT, () => {
+    console.log('listening to PORT : ', PORT)
 })
