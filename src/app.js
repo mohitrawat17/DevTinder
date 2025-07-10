@@ -16,7 +16,7 @@ app.post("/signup", async (req, res) => {
     age: 30,
     gender: "Male",
   };
-
+ 
   // creating a new instace of the UserModel model 
   const user = new UserModel(userObj);
   try {
