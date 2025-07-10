@@ -1,46 +1,45 @@
-const express = require('express')
+const express = require("express");
+const connectDB = require("./config/database");
+const UserModel = require("./models/user");
 
-const app = express()
-const PORT = 5000
+const app = express();
+const PORT = 5000;
 
-const token = 'abc'
+app.post("/signup", async (req, res) => {
+  //  const {firstName,lastName,emailId,password,age,gender}=req.body
 
+  const userObj = {
+    firstName: "Dummy Name",
+    lastName: "Dummy Name",
+    emailId: "dummyemail@gmail.com",
+    password: "dummyPassword",
+    age: 30,
+    gender: "Male",
+  };
 
-app.use((req, res, next) => {
-    const isAuthorized = token === 'abc'
-    if (!isAuthorized) {
-        res.status(401).send({ 'message': 'User not authorized' })
-    }
-    else {
-        next()
-    }
-})
+  // creating a new instace of the UserModel model
+  const user = new UserModel(userObj);
+  try {
+    await user.save();
+    console.log("in");
+    res.status(200).send({
+      ...userObj,
+      message: "Successfully SignedUp",
+    });
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Something went wrong !')
+  }
+});
 
-
-app.get('/user', (req, res) => {
-    console.log('get request')
-    res.send('user get request')
-})
-
-
-// POST REQUEST WITH DYNAMIC PARAMETERS
-app.post('/user/:id', (req, res) => {
-    const id = req.params.id
-    console.log('post request : ', id)
-    res.send('user post request for id : ' + id)
-})
-
-
-app.delete('/user', (req, res) => {
-    console.log('delete request')
-    res.send('user delete request')
-})
-
-app.use('/', (err, req, res, next) => {
-    console.log('error : ', err.message)
-    res.status(500).send('something went wrong')
-})
-
-app.listen(PORT, () => {
-    console.log('listening to PORT : ', PORT)
-})
+connectDB()
+  .then(() => {
+    // first db will connect then server will start so that we can use db in our server
+    console.log("DB connected successfully");
+    app.listen(PORT, () => {
+      console.log("listening to PORT : ", PORT);
+    });
+  })
+  .catch((err) => {
+    console.log("DB connection failed", err.message);
+  });
