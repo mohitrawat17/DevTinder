@@ -5,18 +5,11 @@ const UserModel = require("./models/user");
 const app = express();
 const PORT = 5000;
 
-app.post("/signup", async (req, res) => {
-  //  const {firstName,lastName,emailId,password,age,gender}=req.body
+app.use(express.json()) // this middleware parse JSON data coming from server 
 
-  const userObj = {
-    firstName: "Dummy Name",
-    lastName: "Dummy Name",
-    emailId: "dummyemail@gmail.com",
-    password: "dummyPassword",
-    age: 30,
-    gender: "Male",
-  };
- 
+app.post("/signup", async (req, res) => {
+
+  const userObj=req.body
   // creating a new instace of the UserModel model 
   const user = new UserModel(userObj);
   try {
