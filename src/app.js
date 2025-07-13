@@ -12,15 +12,10 @@ app.post("/signup", async (req, res) => {
   // creating a new instace of the UserModel model
   const user = new UserModel(userObj);
   try {
-    await user.save();
-    console.log("in");
-    res.status(200).send({
-      ...userObj,
-      message: "Successfully SignedUp",
-    });
+    const result = await user.save();
+    res.status(200).send(result);
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Something went wrong !");
+    res.status(500).send(error);
   }
 });
 
@@ -30,7 +25,7 @@ app.get("/users", async (req, res) => {
     const users = await UserModel.find({});
     res.status(200).send(users);
   } catch (error) {
-    res.status(500).send("Internal server error");
+    res.status(500).send(error);
   }
 });
 
@@ -57,15 +52,17 @@ app.patch("/user/:id", async (req, res) => {
   const userId = req.params.id;
 
   try {
-    const updatedUser = await UserModel.findByIdAndUpdate(userId, req.body); //equivalent to ({_id:userId}, {firstName:"Mohit", lastName:"Rawat"})
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, req.body, { //equivalent to ({_id:userId}, {firstName:"Mohit", lastName:"Rawat"})
+      runValidators: true, //allows validators to run which are in the schema
+    }); 
     if (updatedUser) {
       res.status(200).send({ message: "User Updated Successfully !" });
     } else {
       res.status(400).send("User not found !");
     }
   } catch (error) {
-    console.log("catch");
-    res.status(400).send("Internal server error");
+    console.log(error);
+    res.status(400).send(error);
   }
 });
 
