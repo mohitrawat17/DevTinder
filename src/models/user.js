@@ -19,7 +19,11 @@ const userSchema=mongoose.Schema({
      gender:{
         type:String 
      }
-})
+},
+{
+  timestamps: true
+}
+)
 
 const UserModel=mongoose.model("User",userSchema)
 module.exports=UserModel
