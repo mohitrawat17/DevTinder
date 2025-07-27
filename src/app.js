@@ -6,10 +6,12 @@ const jwt = require("jsonwebtoken");
 const UserModel = require("./models/user");
 const { validateUser } = require("./utils/validations");
 const userAuth = require("./middlewares/auth");
-require('dotenv').config()
+require("dotenv").config();
 
 const app = express();
 const PORT = 5000;
+const oneDay = 24 * 60 * 60 * 1000;
+const cookieExpireTime = new Date(Date.now() + oneDay);
 
 app.use(express.json()); // this middleware parses data coming from server into JSON
 app.use(cookieParser()); // this middleware parses cookies from the request.headers and makes them easily accessible via req.cookies
@@ -47,11 +49,11 @@ app.post("/login", async (req, res) => {
 
     if (user) {
       // decrypting password
-      const decryptedPassword = await bcrypt.compare(password, user.password);
-      if (decryptedPassword) {
+      const isPasswordValid = await user.getDecryptedPassword(password)
+      if (isPasswordValid) {
         // if email and password are validated then create a jwt token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY); //encrypting data to jwt
-        res.cookie("token", token); // to set token in client side (in cookies)
+        const token = user.getJWT() //custom instance method for getting JWT
+        res.cookie("token", token, { expires: cookieExpireTime }); // to set token in client side (in cookies)
         res.status(200).send({ message: "Logged in successfully !" });
       } else {
         throw new Error("Invalid credentials.");
@@ -67,10 +69,7 @@ app.post("/login", async (req, res) => {
 
 // api to get my profile
 app.get("/profile", async (req, res) => {
-  const { token } = req.cookies;
-  const jwtDecodedData = jwt.verify(token, process.env.JWT_SECRET_KEY); // decrypting data from jwt
-  const userId = jwtDecodedData.id;
-  const user = await UserModel.findOne({ _id: userId });
+  const user = req.user;
   const userWithoutPassword = user.toObject();
   delete userWithoutPassword.password;
   try {
@@ -80,7 +79,7 @@ app.get("/profile", async (req, res) => {
   }
 });
 
-// to get all the user in db
+// api to get all the user in db
 app.get("/users", async (req, res) => {
   try {
     const users = await UserModel.find({});
@@ -90,7 +89,7 @@ app.get("/users", async (req, res) => {
   }
 });
 
-// to delete user by id
+// api to delete user by id
 app.delete("/user/:id", async (req, res) => {
   const userId = req.params.id;
 
@@ -106,7 +105,7 @@ app.delete("/user/:id", async (req, res) => {
   }
 });
 
-// to update user by id
+// api to update user by id
 app.patch("/user/:id", async (req, res) => {
   const userId = req.params.id;
 
@@ -123,6 +122,13 @@ app.patch("/user/:id", async (req, res) => {
   } catch (error) {
     res.status(400).send(error.message);
   }
+});
+
+// api to send connection request
+
+app.post("/sendConnectionRequest", async (req, res) => {
+  const { user } = req;
+  console.log(user);
 });
 
 connectDB()
