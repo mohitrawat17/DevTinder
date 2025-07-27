@@ -5,36 +5,15 @@ const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const UserModel = require("./models/user");
 const { validateUser } = require("./utils/validations");
+const userAuth = require("./middlewares/auth");
+require('dotenv').config()
 
 const app = express();
 const PORT = 5000;
-const JWT_SECRET_KEY = "rN9v$1kZ@3qT^eFg7*Lz!Bw#XpM8dHsY";
 
 app.use(express.json()); // this middleware parses data coming from server into JSON
 app.use(cookieParser()); // this middleware parses cookies from the request.headers and makes them easily accessible via req.cookies
-app.use("/", async (req, res, next) => {
-  // Exclude login and signup paths
-  if (req.path === "/login" || req.path === "/signup") {
-    return next(); // Skip auth for these routes
-  }
-
-  try {
-    const { token } = req.cookies;
-    if (!token) {
-      throw new Error("Invalid token");
-    }
-    const jwtDecodedData = jwt.verify(token, JWT_SECRET_KEY); // decrypting data from jwt
-    const userId = jwtDecodedData.id;
-    const user = await UserModel.findOne({ _id: userId });
-    if (!user) {
-      throw new Error("No user found.");
-    }
-
-    next();
-  } catch (error) {
-    res.status(400).send(error.message);
-  }
-});
+app.use("/", userAuth);
 
 app.post("/signup", async (req, res) => {
   const userObj = req.body;
@@ -71,7 +50,7 @@ app.post("/login", async (req, res) => {
       const decryptedPassword = await bcrypt.compare(password, user.password);
       if (decryptedPassword) {
         // if email and password are validated then create a jwt token
-        const token = jwt.sign({ id: user._id }, JWT_SECRET_KEY); //encrypting data to jwt
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY); //encrypting data to jwt
         res.cookie("token", token); // to set token in client side (in cookies)
         res.status(200).send({ message: "Logged in successfully !" });
       } else {
@@ -89,7 +68,7 @@ app.post("/login", async (req, res) => {
 // api to get my profile
 app.get("/profile", async (req, res) => {
   const { token } = req.cookies;
-  const jwtDecodedData = jwt.verify(token, JWT_SECRET_KEY); // decrypting data from jwt
+  const jwtDecodedData = jwt.verify(token, process.env.JWT_SECRET_KEY); // decrypting data from jwt
   const userId = jwtDecodedData.id;
   const user = await UserModel.findOne({ _id: userId });
   const userWithoutPassword = user.toObject();
