@@ -15,6 +15,7 @@ const userAuth=  async (req, res, next) => {
     const jwtDecodedData = jwt.verify(token, process.env.JWT_SECRET_KEY); // decrypting data from jwt
     const userId = jwtDecodedData.id;
     const user = await UserModel.findOne({ _id: userId });
+    console.log(user)
     if (!user) {
       throw new Error("No user found.");
     }

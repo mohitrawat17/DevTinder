@@ -1,7 +1,6 @@
-const express=require('express');
-const UserModel = require('../models/user');
-const router=express.Router()
-
+const express = require("express");
+const UserModel = require("../models/user");
+const router = express.Router();
 
 // api to get my profile
 router.get("/profile", async (req, res) => {
@@ -10,6 +9,29 @@ router.get("/profile", async (req, res) => {
   delete userWithoutPassword.password;
   try {
     res.status(200).send(userWithoutPassword);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
+// api to update user by id
+router.patch("/profile/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    if (req.body.password || req.body.emailId) {
+      throw new Error("Invalid Request.");
+    }
+
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, req.body, {
+      //equivalent to ({_id:userId}, {firstName:"Mohit", lastName:"Rawat"})
+      runValidators: true, //allows validators to run which are in the schema
+    });
+    if (updatedUser) {
+      res.status(200).send({ message: "User Updated Successfully !" });
+    } else {
+      res.status(400).send("User not found !");
+    }
   } catch (error) {
     res.status(400).send(error.message);
   }
@@ -41,25 +63,4 @@ router.delete("/user/:id", async (req, res) => {
   }
 });
 
-// api to update user by id
-router.patch("/user/:id", async (req, res) => {
-  const userId = req.params.id;
-
-  try {
-    const updatedUser = await UserModel.findByIdAndUpdate(userId, req.body, {
-      //equivalent to ({_id:userId}, {firstName:"Mohit", lastName:"Rawat"})
-      runValidators: true, //allows validators to run which are in the schema
-    });
-    if (updatedUser) {
-      res.status(200).send({ message: "User Updated Successfully !" });
-    } else {
-      res.status(400).send("User not found !");
-    }
-  } catch (error) {
-    res.status(400).send(error.message);
-  }
-});
-
-
-
-module.exports=router
+module.exports = router;
