@@ -5,7 +5,7 @@ const userAuth = require("./middlewares/auth");
 require("dotenv").config();
 const authRouter=require('./routers/auth')
 const userRouter=require('./routers/user')
-const connectionsRouter=require('./routers/connections')
+const connectionsRouter=require('./routers/requests')
 
 const app = express();
 const PORT = 5000;

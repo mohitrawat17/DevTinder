@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const jwt = require("jsonwebtoken");
-const bcrypt=require("bcrypt")
+const bcrypt = require("bcrypt");
 
 const validGenders = ["male", "female", "others"];
 const expiryTime = "7d";
@@ -33,12 +33,15 @@ const userSchema = mongoose.Schema(
     },
     gender: {
       type: String,
+      enum: validGenders,
+      message: "{VALUE} is not valid gender",
+
       //validate will only when new object is created (for POST not PATCH)
-      validate(data) {
-        if (!validGenders.includes(data)) {
-          throw new Error("Invalid Gender.");
-        }
-      },
+      // validate(data) {
+      //   if (!validGenders.includes(data)) {
+      //     throw new Error("Invalid Gender.");
+      //   }
+      // },
     },
     photo: {
       type: "String",
@@ -51,6 +54,9 @@ const userSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+
+// creating compound index for firstName and lastName
+connectionRequestSchema.index({ firstName: 1, lastName: 1 });
 
 userSchema.methods.getJWT = function () {
   const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
