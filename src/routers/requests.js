@@ -70,7 +70,7 @@ router.patch("/request/review/:status/:requestId", async (req, res) => {
     // to check if it is a valid request
     const isRequestValid = await ConnectionRequestModel.findOne({
       _id: requestId,
-      fromUserId: userId,
+      toUserId: userId,
       status: "interested",
     });
     if (!isRequestValid) {
@@ -86,10 +86,9 @@ router.patch("/request/review/:status/:requestId", async (req, res) => {
     );
     res.status(200).send({
       message:
-        data.status === "interested"
-          ? "Request sent successfully."
-          : "Ignored successfully.",
-      data,
+        status === "accepted"
+          ? "Request accepted successfully."
+          : "Request rejected successfully.",
     });
   } catch (error) {
     res.status(400).send(error.message);
