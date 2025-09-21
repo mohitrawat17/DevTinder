@@ -56,7 +56,7 @@ const userSchema = mongoose.Schema(
 );
 
 // creating compound index for firstName and lastName
-connectionRequestSchema.index({ firstName: 1, lastName: 1 });
+userSchema.index({ firstName: 1, lastName: 1 });
 
 userSchema.methods.getJWT = function () {
   const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {

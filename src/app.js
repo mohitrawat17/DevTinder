@@ -4,8 +4,9 @@ const cookieParser = require("cookie-parser");
 const userAuth = require("./middlewares/auth");
 require("dotenv").config();
 const authRouter=require('./routers/auth')
-const userRouter=require('./routers/user')
+const profileRouter=require('./routers/profile')
 const connectionsRouter=require('./routers/requests')
+const userRouter=require('./routers/user')
 
 const app = express();
 const PORT = 5000;
@@ -16,8 +17,9 @@ app.use("/", userAuth);
 
 
 app.use('/',authRouter)
-app.use('/',userRouter)
+app.use('/',profileRouter)
 app.use('/',connectionsRouter)
+app.use('/',userRouter)
 
 
 connectDB()
