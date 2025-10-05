@@ -7,6 +7,7 @@ const router = express.Router();
 // api to get my profile
 router.get("/profile", async (req, res) => {
   const user = req.user;
+  console.log(user)
   const userWithoutPassword = user.toObject();
   delete userWithoutPassword.password;
   try {
