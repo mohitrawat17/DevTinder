@@ -84,4 +84,14 @@ router.get("/user/feed", async (req, res) => {
   }
 });
 
+// logout api
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false, // true in production (HTTPS)
+    sameSite: "lax",
+  });
+  return res.status(200).json({ message: "Logged out successfully" });
+});
+
 module.exports = router;
