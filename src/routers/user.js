@@ -19,7 +19,7 @@ router.get("/user/requests/recieved", async (req, res) => {
       toUserId: userId,
       status: "interested",
     }).populate("fromUserId", userDataKeys);
-    const responseToSend = connectionRequests.map((item) => item.fromUserId);
+    const responseToSend = connectionRequests.map((item) => item);
     res
       .status(200)
       .json({ message: "Data fetched successfully", data: responseToSend });
@@ -77,7 +77,6 @@ router.get("/user/feed", async (req, res) => {
       .select(userDataKeys)
       .skip((page - 1) * pageSize)
       .limit(pageSize);
-    console.log(req.params);
     res.status(200).json({ data: users });
   } catch (error) {
     res.status(400).json({ message: error.message });
