@@ -1,6 +1,7 @@
 const express = require("express");
 const ConnectionRequestModel = require("../models/connectionRequest");
 const UserModel = require("../models/user");
+const { sendEmail } = require("../utils/sendEmail");
 const router = express.Router();
 
 // api to send connection request
@@ -41,6 +42,16 @@ router.post("/request/:status/:toUserId", async (req, res) => {
     });
 
     const data = await connectionRequest.save();
+
+    // sending email to notify user
+
+    const emailRes = await sendEmail(
+      "Hello from AWS SES (classic) ✅",
+      "This email is sent using SES classic with require().",
+      isToUserIdValid.emailId
+    );
+    console.log(emailRes, isToUserIdValid);
+
     res.status(201).send({
       message:
         data.status === "interested"
@@ -52,7 +63,6 @@ router.post("/request/:status/:toUserId", async (req, res) => {
     res.status(400).send(error.message);
   }
 });
-
 
 // accept or reject connection request
 router.patch("/request/review/:status/:requestId", async (req, res) => {
